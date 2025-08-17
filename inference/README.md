@@ -215,14 +215,13 @@ docker pull nvcr.io/nvidia/tritonserver:22.05-py3-sdk
 Next, run the triton client container image. 
 
 ```
-docker run -it --network host nvcr.io/nvidia/tritonserver:22.05-py3-sdk
+docker run -it --network host -e INFERENCE_URL="http://${DNS_NAME_LABEL}.${AZURE_RESOURCE_GROUP_LOCATION}.azurecontainer.io:8000" nvcr.io/nvidia/tritonserver:22.05-py3-sdk
 ```
 From the container, send an inference request using one of the sample applications. For example,
 
 ```
 cd install/bin
-http_proxy=http://127.0.0.1:15001 ./image_client -m densenet_onnx -c 3 -s INCEPTION ../../images/mug.jpg -u http://conf-inference.westeurope.azurecontainer.io:8000
-
+http_proxy=http://127.0.0.1:15001 ./image_client -m densenet_onnx -c 3 -s INCEPTION ../../images/mug.jpg -u $INFERENCE_URL
 ```
 Setting ```http_proxy``` redirects all HTTP traffic via the proxy, which establishes an attested TLS connection with the service. All subsequent requests and responses are encrypted with keys negotiatiated after the service has proven that it is running in a confidential container instance with a complaint UVM kernel and expected container security policy. 
 
